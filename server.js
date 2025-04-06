@@ -5,7 +5,7 @@ const cors = require("cors");
 
 const app = express();
 app.use(express.json())
-app.use(cors({origin: 'https://tranquil-naiad-3d74f7.netlify.app'}));
+app.use(cors({origin: 'https://cheery-marzipan-89b036.netlify.app'}));
 
 dotenv.config();
 
