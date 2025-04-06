@@ -5,7 +5,7 @@ const cors = require("cors");
 
 const app = express();
 app.use(express.json())
-app.use(cors({origin: 'https://your-netlify-app.netlify.app'}));
+app.use(cors({origin: 'https://tranquil-naiad-3d74f7.netlify.app'}));
 
 dotenv.config();
 
@@ -28,7 +28,7 @@ const model = mongoose.model("loginCred",schema);
 
 const taskmodel = mongoose.model('Task', taskSchema);
 
-const PORT = process.env.PORT || 3000
+const PORT = process.env.PORT;
 
 app.listen(PORT,()=>{
     console.log(`server listening at ${PORT}`);
