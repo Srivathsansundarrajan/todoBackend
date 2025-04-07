@@ -5,7 +5,8 @@ const cors = require("cors");
 
 const app = express();
 app.use(express.json())
-app.use(cors({origin: 'https://cheery-marzipan-89b036.netlify.app'}));
+app.use(cors({origin: 'https://gleaming-sunflower-f114ca.netlify.app'}));
+// app.use(cors({origin:'http://localhost:5173'}));
 
 dotenv.config();
 
@@ -21,20 +22,20 @@ const schema = mongoose.Schema({
 const taskSchema = new mongoose.Schema({
     email: { type: String, required: true },
     task: { type: String, required: true },
-    
-  });
+    completed : {type: Boolean,required:true}    
+});
 
 const model = mongoose.model("loginCred",schema);
-
 const taskmodel = mongoose.model('Task', taskSchema);
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT||5000;
 
 app.listen(PORT,()=>{
     console.log(`server listening at ${PORT}`);
 });
 
 app.post("/login", async (req, res) => {
+  console.log("Hiii");
     const { email, psd } = req.body;
     console.log(email);
     try {
@@ -45,7 +46,7 @@ app.post("/login", async (req, res) => {
             res.status(401).json({ message: "User not found" });
         }
     } catch (error) {
-        res.status(500).json({ message: "Internal server error" });
+        res.status(500).json({ message: error });
     }
 });
 
@@ -81,10 +82,10 @@ app.get("/todo/:email", async (req, res) => {
   });
 
   app.post("/todo/add", async (req, res) => {
-    const { email, task } = req.body;
+    const { email, task,completed} = req.body;
   
     try {
-      const newTask = new taskmodel({"email":email, "task":task });
+      const newTask = new taskmodel({"email":email, "task":task ,"completed":completed});
       await newTask.save();
   
       
@@ -100,5 +101,30 @@ app.get("/todo/:email", async (req, res) => {
       res.status(200).json({ message: 'Task deleted' });
     } catch (err) {
       res.status(500).json({ error: 'Failed to delete task' });
+    }
+  });
+  
+  app.put('/todo/taskUpdate', async (req, res) => {
+    try {
+      const { email, task, completed } = req.body;
+  
+      if (!email || !task || typeof completed !== 'boolean') {
+        return res.status(400).json({ message: 'Invalid request body' });
+      }
+  
+      const updatedTask = await taskmodel.findOneAndUpdate(
+        { email, task },            // Find task by email + task name
+        { completed: completed },   // Update the completed field
+        { new: true }               // Return the updated document
+      );
+  
+      if (!updatedTask) {
+        return res.status(404).json({ message: 'Task not found' });
+      }
+  
+      res.status(200).json({ message: 'Task updated successfully', task: updatedTask });
+    } catch (error) {
+      console.error('Error updating task:', error);
+      res.status(500).json({ message: error });
     }
   });
